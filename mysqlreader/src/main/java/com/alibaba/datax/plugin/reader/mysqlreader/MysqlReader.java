@@ -3,7 +3,6 @@ package com.alibaba.datax.plugin.reader.mysqlreader;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import com.alibaba.datax.plugin.rdbms.reader.Constant;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ public class MysqlReader extends Reader {
                 .getLogger(Job.class);
 
         private Configuration originalConfig = null;
-        private CommonRdbmsReader.Job commonRdbmsReaderJob;
+        private CommonMysqlReader.Job commonRdbmsReaderJob;
 
         @Override
         public void init() {
@@ -33,7 +32,7 @@ public class MysqlReader extends Reader {
 
             this.originalConfig.set(Constant.FETCH_SIZE, Integer.MIN_VALUE);
 
-            this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
+            this.commonRdbmsReaderJob = new CommonMysqlReader.Job(DATABASE_TYPE);
             this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
@@ -64,12 +63,12 @@ public class MysqlReader extends Reader {
     public static class Task extends Reader.Task {
 
         private Configuration readerSliceConfig;
-        private CommonRdbmsReader.Task commonRdbmsReaderTask;
+        private CommonMysqlReader.Task commonRdbmsReaderTask;
 
         @Override
         public void init() {
             this.readerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE,super.getTaskGroupId(), super.getTaskId());
+            this.commonRdbmsReaderTask = new CommonMysqlReader.Task(DATABASE_TYPE,super.getTaskGroupId(), super.getTaskId());
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
 
         }
