@@ -74,7 +74,7 @@
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
             <version>1.4.10</version>
@@ -86,7 +86,7 @@
             <artifactId>powermock-module-junit4</artifactId>
             <version>1.4.10</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
