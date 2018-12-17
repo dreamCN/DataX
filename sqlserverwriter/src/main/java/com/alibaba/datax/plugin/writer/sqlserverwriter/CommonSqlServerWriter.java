@@ -292,7 +292,7 @@ public class CommonSqlServerWriter {
 
                         if (writeMode.trim().toLowerCase().startsWith("update")) {
                             doOneInsert(connection, writeBuffer);
-                        }else {
+                        } else {
                             doBatchInsert(connection, writeBuffer);
                         }
                         writeBuffer.clear();
@@ -303,7 +303,7 @@ public class CommonSqlServerWriter {
                 if (!writeBuffer.isEmpty()) {
                     if (writeMode.trim().toLowerCase().startsWith("update")) {
                         doOneInsert(connection, writeBuffer);
-                    }else {
+                    } else {
                         doBatchInsert(connection, writeBuffer);
                     }
                     writeBuffer.clear();
@@ -432,38 +432,37 @@ public class CommonSqlServerWriter {
         */
 
 
-
             //当前参数位置
             Integer index = 0;
             //if exists 部分 where 语句 条件参数
             for (int n = 0; n < columns.size(); n++) {
-                if(updateKeys.contains(columns.get(n))){
+                if (updateKeys.contains(columns.get(n))) {
                     int columnSqltype = this.resultSetMetaData.getMiddle().get(n);
-                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(n));
-                    index ++;
+                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(n), n);
+                    index++;
                 }
             }
             //update 语句 set 参数
             for (int x = 0; x < columns.size(); x++) {
-                if(! updateKeys.contains(columns.get(x))){
+                if (!updateKeys.contains(columns.get(x))) {
                     int columnSqltype = this.resultSetMetaData.getMiddle().get(x);
-                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(x));
-                    index ++;
+                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(x), x);
+                    index++;
                 }
             }
             //update 语句 where 参数
             for (int z = 0; z < columns.size(); z++) {
-                if(updateKeys.contains(columns.get(z))){
+                if (updateKeys.contains(columns.get(z))) {
                     int columnSqltype = this.resultSetMetaData.getMiddle().get(z);
-                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(z));
-                    index ++;
+                    preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(z), z);
+                    index++;
                 }
             }
             //insert 语句 参数
             for (int i = 0; i < this.columnNumber; i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(i));
-                index ++;
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, index, columnSqltype, record.getColumn(i), i);
+                index++;
             }
 
             return preparedStatement;
@@ -474,13 +473,13 @@ public class CommonSqlServerWriter {
                 throws SQLException {
             for (int i = 0; i < this.columnNumber; i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i), i);
             }
 
             return preparedStatement;
         }
 
-        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column) throws SQLException {
+        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int index, int columnSqltype, Column column, int columnIndex) throws SQLException {
             java.util.Date utilDate;
             switch (columnSqltype) {
                 case Types.CHAR:
@@ -491,7 +490,7 @@ public class CommonSqlServerWriter {
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
                 case Types.LONGNVARCHAR:
-                    preparedStatement.setString(columnIndex + 1, column
+                    preparedStatement.setString(index + 1, column
                             .asString());
                     break;
 
@@ -505,9 +504,9 @@ public class CommonSqlServerWriter {
                 case Types.DOUBLE:
                     String strValue = column.asString();
                     if (emptyAsNull && "".equals(strValue)) {
-                        preparedStatement.setString(columnIndex + 1, null);
+                        preparedStatement.setString(index + 1, null);
                     } else {
-                        preparedStatement.setString(columnIndex + 1, strValue);
+                        preparedStatement.setString(index + 1, strValue);
                     }
                     break;
 
@@ -515,9 +514,9 @@ public class CommonSqlServerWriter {
                 case Types.TINYINT:
                     Long longValue = column.asLong();
                     if (null == longValue) {
-                        preparedStatement.setString(columnIndex + 1, null);
+                        preparedStatement.setString(index + 1, null);
                     } else {
-                        preparedStatement.setString(columnIndex + 1, longValue.toString());
+                        preparedStatement.setString(index + 1, longValue.toString());
                     }
                     break;
 
@@ -526,9 +525,9 @@ public class CommonSqlServerWriter {
                     if (this.resultSetMetaData.getRight().get(columnIndex)
                             .equalsIgnoreCase("year")) {
                         if (column.asBigInteger() == null) {
-                            preparedStatement.setString(columnIndex + 1, null);
+                            preparedStatement.setString(index + 1, null);
                         } else {
-                            preparedStatement.setInt(columnIndex + 1, column.asBigInteger().intValue());
+                            preparedStatement.setInt(index + 1, column.asBigInteger().intValue());
                         }
                     } else {
                         java.sql.Date sqlDate = null;
@@ -542,7 +541,7 @@ public class CommonSqlServerWriter {
                         if (null != utilDate) {
                             sqlDate = new java.sql.Date(utilDate.getTime());
                         }
-                        preparedStatement.setDate(columnIndex + 1, sqlDate);
+                        preparedStatement.setDate(index + 1, sqlDate);
                     }
                     break;
 
@@ -558,7 +557,7 @@ public class CommonSqlServerWriter {
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
                     }
-                    preparedStatement.setTime(columnIndex + 1, sqlTime);
+                    preparedStatement.setTime(index + 1, sqlTime);
                     break;
 
                 case Types.TIMESTAMP:
@@ -574,28 +573,28 @@ public class CommonSqlServerWriter {
                         sqlTimestamp = new java.sql.Timestamp(
                                 utilDate.getTime());
                     }
-                    preparedStatement.setTimestamp(columnIndex + 1, sqlTimestamp);
+                    preparedStatement.setTimestamp(index + 1, sqlTimestamp);
                     break;
 
                 case Types.BINARY:
                 case Types.VARBINARY:
                 case Types.BLOB:
                 case Types.LONGVARBINARY:
-                    preparedStatement.setBytes(columnIndex + 1, column
+                    preparedStatement.setBytes(index + 1, column
                             .asBytes());
                     break;
 
                 case Types.BOOLEAN:
-                    preparedStatement.setString(columnIndex + 1, column.asString());
+                    preparedStatement.setString(index + 1, column.asString());
                     break;
 
                 // warn: bit(1) -> Types.BIT 可使用setBoolean
                 // warn: bit(>1) -> Types.VARBINARY 可使用setBytes
                 case Types.BIT:
                     if (this.dataBaseType == DataBaseType.MySql) {
-                        preparedStatement.setBoolean(columnIndex + 1, column.asBoolean());
+                        preparedStatement.setBoolean(index + 1, column.asBoolean());
                     } else {
-                        preparedStatement.setString(columnIndex + 1, column.asString());
+                        preparedStatement.setString(index + 1, column.asString());
                     }
                     break;
                 default:
